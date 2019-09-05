@@ -6,14 +6,26 @@ const dashboardSchema = new Schema({
   dashboardName: String,
   description: String,
   group: [{
-    id: ObjectId,
+    user_id: ObjectId,
     userName: String,
   }],
   columns: [columnSchema],
   creator: {
     user_id: ObjectId,
     userName: String,
+  },
+  messages: [
+    {
+      authorName: String,
+      author_id: ObjectId,
+      text: String,
+    }
+  ],
+  chat: {
+
   }
+
+
 });
 
 dashboardSchema.statics.addColumn = function (dashboard_id, column, callback) {
@@ -144,6 +156,107 @@ dashboardSchema.statics.updateCardInColumn = function (dashboard_id, column_id, 
       }
 
     }
+  })
+};
+dashboardSchema.statics.replaceCard = function (dashboard_id,
+                                                card_id,
+                                                columnSource_id,
+                                                columnSourceInd,
+                                                cardSourceInd,
+                                                columnTarget_id,
+                                                columnTargetInd,
+                                                cardTargetInd,
+                                                callback) {
+  return this.findOne({_id: dashboard_id}, (error, dash) => {
+    if (error) {
+      callback(error);
+    } else {
+      if (columnSource_id === columnTarget_id &&
+        (cardSourceInd === cardTargetInd || cardSourceInd - 1 === cardTargetInd))
+        return dash;
+
+      let columnSource = dash.columns.id(columnSource_id);
+
+      const card = columnSource.cards.id(card_id);
+      columnSource.cards.remove(card_id);
+
+      let columnTarget;
+      (columnSource_id === columnTarget_id)
+        ? columnTarget = columnSource
+        : columnTarget = dash.columns.id(columnTarget_id);
+
+      let shift;
+      (columnSource_id === columnTarget_id && cardSourceInd < cardTargetInd)
+        ? shift = 0
+        : shift = 1;
+
+      const newCards = [
+        ...columnTarget.cards.slice(0, cardTargetInd + shift),
+        card,
+        ...columnTarget.cards.slice(cardTargetInd + shift, columnTarget.cards.length),
+      ];
+      columnTarget.cards = newCards;
+
+
+      dash.columns[columnTargetInd] = columnTarget;
+      dash.markModified();
+      dash.save(callback);
+    }
+  })
+
+};
+dashboardSchema.statics.replaceColumn = function (dashboard_id, column_id,
+                                                  columnSourceInd, columnTargetInd, callback) {
+
+  return this.findOne({_id: dashboard_id}, (error, dash) => {
+    if (error) {
+      callback(error);
+    }
+    if (columnSourceInd === columnTargetInd || columnSourceInd - 1 === columnTargetInd) {
+      return dash;
+    }
+    let column = dash.columns.id(column_id);
+    dash.columns.remove(column_id);
+    let shift;
+    (columnSourceInd < columnTargetInd)
+      ? shift = 0
+      : shift = 1;
+    const newColumns = [
+      ...dash.columns.slice(0, columnTargetInd + shift),
+      column,
+      ...dash.columns.slice(columnTargetInd + shift, dash.columns.length)
+    ];
+
+    dash.columns = newColumns;
+
+    dash.save(callback);
+
+
+  })
+}
+
+dashboardSchema.statics.addMessage = function (dashboard_id, user_id, userName, text, callback) {
+  return this.findOne({_id: dashboard_id}, (error, dash) => {
+    if (error) callback(error);
+    const newMessage = {
+      authorName: userName,
+      author_id: user_id,
+      text: text,
+    };
+    dash.messages.push(newMessage);
+   // dash.markModified();
+    dash.save(callback)
+  })
+};
+dashboardSchema.methods.addUser = function(user_id,userName,callback) {
+  this.group.push({user_id,userName});
+  this.save(callback)
+};
+dashboardSchema.statics.getMessages = function (dashboard_id, callback) {
+  return this.findOne({_id: dashboard_id}, (error, dash) => {
+    if (error) callback(error);
+    const messages = dash.messages;
+    callback(null, messages);
   })
 };
 

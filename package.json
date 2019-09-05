@@ -9,6 +9,7 @@
     "async": "^2.6.2",
     "connect-mongo": "^2.0.3",
     "cookie-parser": "~1.4.3",
+    "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "debug": "~2.6.9",
     "express": "~4.16.0",
@@ -22,6 +23,9 @@
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "pug": "2.0.0-beta11"
+    "pug": "2.0.0-beta11",
+    "random-bytes": "^1.0.0",
+    "uid-safe": "^2.1.5",
+    "ws": "^7.1.2"
   }
 }

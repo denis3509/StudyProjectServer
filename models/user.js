@@ -24,17 +24,21 @@ const userSchema = new Schema({
 
 
 userSchema.statics.signUp = function (user, callback) {
-  const newUser = new User(user);
+  if (user.password === user.passwordConfirm) {
+    const newUser = new User(user);
 
-  newUser.setPassword(user.password);
-  newUser.save(callback);
+    newUser.setPassword(user.password);
+    newUser.save(callback);
+  } else {
+    callback(new Error("passwords doesnt match"))
+  }
 };
 userSchema.statics.login = function (login, password, callback) {
   if (login && password) {
-    this.findOne({ login}, (error, foundUser) => {
+    this.findOne({login}, (error, foundUser) => {
       if (error) {
         callback(new Error('no user found'), null);
-      } else if (foundUser){
+      } else if (foundUser) {
         const validate = foundUser.validatePassword(password.toString());
         if (validate) {
           callback(null, foundUser);
@@ -67,16 +71,20 @@ userSchema.methods.joinDashboard = function (dashboard, callback) {
   this.save(callback);
 
 };
-userSchema.methods.leaveDashboard = function (_id, callback) {
-  const newDashboardList = [...this.dashboardList];
-  let deleted = newDashboardList.splice(index, 1);
-  const dash = this.dashboardList.id(_id);
-  if (dash) {
-    dash.remove();
-    this.save(callback);
-  } else {
-    callback(new Error('dashboard not found in list'));
-  }
+userSchema.methods.leaveDashboard = function (dashboard_id, callback) {
+  let dashboardListClone = [...this.dashboardList];
+  dashboardListClone.forEach(dash => {
+    // console.log('dash.dashboard.id: ' + dash.dashboard_id +
+    //   ', dashboard_id: ' + dashboard_id
+    // + ', ===: ' + (dash.dashboard_id.toString() === dashboard_id.toString()) )
+    if (dash.dashboard_id.toString() === dashboard_id.toString()) {
+
+      this.dashboardList.remove(dash._id)
+    }
+  });
+
+  this.save(callback);
+
 
 };
 
@@ -89,6 +97,7 @@ userSchema.methods.validatePassword = function (password) {
   const hash = crypto.pbkdf2Sync(password, this.salt, 10000, 512, 'sha512').toString('hex');
   return this.hashedPassword === hash;
 };
+
 
 const User = mongoose.model('User', userSchema);
 

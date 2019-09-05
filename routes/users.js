@@ -10,11 +10,11 @@ router.post('/signUp', function (req, res, next) {
     userName,
     login,
     password,
+    passwordConfirm,
     email
   } = req.body;
 
-  if (userName && login && password && email) {
-    User.signUp({login, userName, password, email}, (error, user) => {
+    User.signUp({login, userName, password, passwordConfirm, email}, (error, user) => {
       if (error) {
         next(error);
       } else {
@@ -22,14 +22,11 @@ router.post('/signUp', function (req, res, next) {
         res.json(user);
       }
     })
-  } else {
-    next(new Error('user field is empty'))
-  }
 
 });
 
 router.get('/user/get', checkAuth, function (req, res, next) {
-  User.findById(req.session.user, {_id: false, salt: false, hashedPassword: false}, (error, user) => {
+  User.findById(req.session.user, {salt: false, hashedPassword: false}, (error, user) => {
     if (error) {
       next(new Error('user not found'))
     } else {
@@ -39,19 +36,20 @@ router.get('/user/get', checkAuth, function (req, res, next) {
 });
 
 router.post('/login', function (req, res, next) {
-  const {login , password} = req.body;
-    User.login(login,password, (error, user) => {
-      if (error) {
-        next(error);
-      } else {
-        req.session.user = user._id;
-        const {
-          userName,
-          dashboardList
-        } = user;
-        res.send({userName, dashboardList});
-      }
-    })
+  const {login, password} = req.body;
+  User.login(login, password, (error, user) => {
+    if (error) {
+      next(error);
+    } else {
+      req.session.user = user._id;
+      const {
+        userName,
+        dashboardList,
+        _id,
+      } = user;
+      res.send({userName, dashboardList, _id});
+    }
+  })
 
 
 });
@@ -59,4 +57,6 @@ router.get('/logout', (req, res, next) => {
   req.session.destroy();
   res.send('logout');
 });
+
+
 module.exports = router;
