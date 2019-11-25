@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const Dashboard = require('../models/dashboard');
 const User = require('../models/user');
+const config = require('config');
 
-mongoose.connect('mongodb://localhost:27017/StudyProjectDB', {useNewUrlParser: true},(error)=>{
+mongoose.connect(config.mongodbConnectionURI, {useNewUrlParser: true},(error)=>{
   if (error) {
     console.log('connection failed: ', error);
   } else {
