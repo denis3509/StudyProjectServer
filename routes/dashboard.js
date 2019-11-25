@@ -49,8 +49,8 @@ router.post('/dashboard', (req, res, next) => {
   function addDashboard(dash, callback) {
     const newDash = new Dashboard(dash);
     newDash.group.push({
-      user_id : req.session.user,
-      userName : 'userName'
+      user_id: req.session.user,
+      userName: 'userName'
     });
     newDash.save((error, dash) => {
       if (error) {
@@ -77,7 +77,7 @@ router.post('/dashboard', (req, res, next) => {
 });
 router.put('/dashboard', (req, res, next) => {
   const {dashboard_id} = req.query;
-  const {update} = req.body;
+  const update = req.body;
 
   if (dashboard_id) { //TODO вернуть обновленный объект
     Dashboard.findOneAndUpdate({_id: dashboard_id}, update, (error, dash) => {
@@ -100,7 +100,7 @@ router.delete('/dashboard', (req, res, next) => {
         return user.toObject().user_id;
       });
 
-        User.find({_id: ids}, (error, result) => {
+      User.find({_id: ids}, (error, result) => {
         if (error) next(error);
         async.each(result, (user, callback) => {
           user.leaveDashboard(dashboard_id, callback)
@@ -113,7 +113,6 @@ router.delete('/dashboard', (req, res, next) => {
           }
         })
       });
-
 
 
     })
@@ -216,13 +215,11 @@ router.put('/card', (req, res, next) => {
   const update = req.body;
 
   if (dashboard_id && column_id && card_id) {
-    Dashboard.updateCardInColumn(dashboard_id, column_id, card_id, update, (error, dash) => {
+    Dashboard.updateCardInColumn(dashboard_id, column_id, card_id, update, (error, card) => {
       if (error) {
         next(error);
       } else {
-        console.log(dash);
-
-        res.send(dash);
+        res.send(card);
       }
     })
   } else {
@@ -270,7 +267,7 @@ router.put('/column', (req, res, next) => {
   const {dashboard_id, column_id} = req.query;
   const update = req.body;
   if (dashboard_id && column_id) {
-    Dashboard.removeColumn(dashboard_id, column_id, update, (error, dash) => {
+    Dashboard.updateColumn(dashboard_id, column_id, update, (error, dash) => {
       if (error) {
         next(error);
       } else {

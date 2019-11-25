@@ -147,7 +147,9 @@ dashboardSchema.statics.updateCardInColumn = function (dashboard_id, column_id, 
           for (let key in update) {
             card[key] = update[key];
           }
-          dash.save(callback)
+          dash.save((error,dash)=>{
+            callback(error,card);
+          })
         } else {
           callback(new Error('card not found'));
         }
