@@ -4,8 +4,15 @@ const mongoose = require('mongoose');
 const Dashboard = mongoose.model('Dashboard');
 const User = mongoose.model('User');
 const async = require('async');
+const dashboardController = require('../controllers/dashboard');
+router.get('/dashboard',dashboardController.getDashboard);
+router.post('/dashboard', dashboardController.createDashboard);
+router.put('/dashboard', dashboardController.updateDashboard);
+router.delete('/dashboard', dashboardController.removeDashboard);
+router.put('/dashboard/invite', dashboardController.updateDashboard);
+router.get('/dashboard/messages', dashboardController.getMessages);
 
-router.get('/dashboard', (req, res, next) => {
+/*router.get('/dashboard', (req, res, next) => {
   const dashboard_id = req.query.dashboard_id;
   if (dashboard_id) {
     Dashboard.findById(dashboard_id, (error, dash) => {
@@ -174,8 +181,14 @@ router.put('/dashboard/invite', (req, res, next) => {
     next(new Error('wrong query'));
   }
 });
-
-
+router.get('/dashboard/messages', (req, res, next) => {
+  const {dashboard_id} = req.query;
+  Dashboard.getMessages(dashboard_id, (error, messages) => {
+    if (error) next(error);
+    res.send(messages);
+  })
+});*/
+/*
 router.get('/card', (req, res, next) => {
   const {dashboard_id, column_id, card_id} = req.query;
   const card = req.body;
@@ -261,8 +274,6 @@ router.post('/column', (req, res, next) => {
     next(new Error('update error: query is incorrect'))
   }
 });
-
-
 router.put('/column', (req, res, next) => {
   const {dashboard_id, column_id} = req.query;
   const update = req.body;
@@ -342,12 +353,7 @@ router.post('/card/replace', (req, res, next) => {
     next(new Error('replaceCard error: query is incorrect'))
   }
 });
+*/
 
-router.get('/dashboard/messages', (req, res, next) => {
-  const {dashboard_id} = req.query;
-  Dashboard.getMessages(dashboard_id, (error, messages) => {
-    if (error) next(error);
-    res.send(messages);
-  })
-});
+
 module.exports = router;

@@ -10,7 +10,8 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');
-const cardsRouter = require('./routes/cards');
+const cardRouter = require('./routes/card');
+const columnRouter = require('./routes/column');
 const dashboardsRouter = require('./routes/dashboard');
 const config = require('./config');
 const checkAuth = require('./middleware/checkAuth').checkAuth;
@@ -43,6 +44,8 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use(checkAuth);
 app.use('/dashboards', dashboardsRouter);
+app.use('/dashboards', cardRouter);
+app.use('dashboards', columnRouter);
 //app.use('/cards', cardsRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

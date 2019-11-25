@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-require('../models/dashboard');
-require('../models/user');
+const Dashboard = require('../models/dashboard');
+const User = require('../models/user');
 
 mongoose.connect('mongodb://localhost:27017/StudyProjectDB', {useNewUrlParser: true},(error)=>{
   if (error) {
@@ -10,3 +10,7 @@ mongoose.connect('mongodb://localhost:27017/StudyProjectDB', {useNewUrlParser: t
   }
 });
 
+module.exports = {
+  Dashboard,
+  User,
+};
