@@ -23,7 +23,7 @@
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "pug": "2.0.0-beta11",
+    "pug": "3.0.1",
     "random-bytes": "^1.0.0",
     "uid-safe": "^2.1.5",
     "ws": "^7.1.2"
